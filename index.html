@@ -2,7 +2,6 @@
 <html>
 <head>
 <meta charset="UTF-8">
-
 <title>CEK UMUR BY PAK KAJI</title>
 
 <style>
@@ -104,31 +103,22 @@ CEK UMUR BY PAK KAJI
 <option value="TAMTAMA">TAMTAMA</option>
 </select>
 
-
 <label>PENDIDIKAN TERAKHIR</label>
 
 <select id="pendidikan">
 <option value="">PILIH PENDIDIKAN</option>
 </select>
 
-
 <label>TANGGAL LAHIR</label>
 
 <input type="date" id="lahir">
 
-
 <button onclick="hitung()">CEK UMUR</button>
 
-
-<div class="result" id="hasil">
-
-</div>
-
+<div class="result" id="hasil"></div>
 
 </div>
 </div>
-
-
 
 <script>
 
@@ -191,19 +181,37 @@ pendidikan.appendChild(opt);
 
 function hitung(){
 
-let lahir=new Date(document.getElementById("lahir").value);
-let sekarang=new Date();
+let lahirInput=document.getElementById("lahir").value;
 
+if(lahirInput==""){
+alert("Tanggal lahir belum diisi");
+return;
+}
+
+let lahir=new Date(lahirInput);
 let jalur=document.getElementById("jalur").value;
 let pendidikan=document.getElementById("pendidikan").value;
 
-let tahun=sekarang.getFullYear()-lahir.getFullYear();
-let bulan=sekarang.getMonth()-lahir.getMonth();
-let hari=sekarang.getDate()-lahir.getDate();
+/* TANGGAL BUKA DIK */
+
+let bukaDik;
+
+if(jalur=="AKPOL"){
+bukaDik=new Date("2026-08-01");
+}else{
+bukaDik=new Date("2026-07-20");
+}
+
+/* HITUNG UMUR */
+
+let tahun=bukaDik.getFullYear()-lahir.getFullYear();
+let bulan=bukaDik.getMonth()-lahir.getMonth();
+let hari=bukaDik.getDate()-lahir.getDate();
 
 if(hari<0){
 bulan--;
-hari+=30;
+let lastMonth=new Date(bukaDik.getFullYear(),bukaDik.getMonth(),0);
+hari+=lastMonth.getDate();
 }
 
 if(bulan<0){
@@ -211,37 +219,47 @@ tahun--;
 bulan+=12;
 }
 
-let umur=tahun+(bulan/12);
+/* UMUR DESIMAL */
 
-let batas=0;
+let umur=tahun+(bulan/12)+(hari/365);
+
+
+/* BATAS UMUR */
+
+let min=0;
+let max=0;
 
 if(jalur=="AKPOL"){
-batas=21;
+min=16;
+max=21;
 }
 
 if(jalur=="TAMTAMA"){
-batas=22;
+min=17+(7/12);
+max=22;
 }
 
 if(jalur=="BINTARA"){
 
+min=17+(7/12);
+
 if(["D-I","D-II","D-III"].includes(pendidikan)){
-batas=24;
+max=24;
 }
-
 else if(["D4","S1"].includes(pendidikan)){
-batas=27;
+max=27;
 }
-
 else{
-batas=21;
+max=21;
 }
 
 }
+
+/* STATUS */
 
 let status="";
 
-if(umur<=batas){
+if(umur>=min && umur<=max){
 
 status="<span class='statusMS'>MEMENUHI SYARAT (MS)</span>";
 
@@ -254,7 +272,6 @@ status="<span class='statusTMS'>TIDAK MEMENUHI SYARAT (TMS)</span>";
 document.getElementById("hasil").innerHTML=
 
 "UMUR : "+tahun+" TAHUN "+bulan+" BULAN "+hari+" HARI <br><br>" +
-
 "STATUS : "+status;
 
 }
